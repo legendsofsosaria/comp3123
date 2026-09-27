@@ -10,6 +10,8 @@ const port = process.env.PORT || 8081
 
 //Create Web Server using CORE API
 const server = http.createServer((req, res) => {
+    let emp = Employee.employees;
+
     if (req.method !== 'GET')
     {
         res.end(`{"error": "${http.STATUS_CODES[405]}"}`)
@@ -20,6 +22,7 @@ const server = http.createServer((req, res) => {
         if (req.url === '/')
         {
             //TODO - Display message "<h1>Welcome to Lab Exercise 03</h1>"
+            res.writeHead(200, {'Context-Type': 'application/html'});
             res.write("<h1>Welcome to Lab Exercise 03</h1>")
             res.end();
         }
@@ -28,16 +31,31 @@ const server = http.createServer((req, res) => {
         {
             //TODO - Display all details for employees in JSON format
             res.writeHead(200, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify(Employee.employees));
+            res.write(JSON.stringify(emp));
             res.end();
         }
 
         else if (req.url === '/employee/names')
         {
+            let emp_copy = [...Employee.employees];
+
+            // Sort employees by first name
+            emp_copy.sort((a, b) =>
+            {
+                if (a.firstName < b.firstName)
+                    return -1;
+                if (a.firstName > b.firstName)
+                    return 1;
+                return 0;
+            })
+
+            // create array of first names and last names with whitespace
+            let full_names = emp_copy.map(employee => employee.firstName + " " + employee.lastName);
+
             //TODO - Display only all employees {first name + lastname} in Ascending order in JSON Array
             //e.g. [ "Ash Lee", "Mac Mohan", "Pritesh Patel"]
             res.writeHead(200, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify(Employee.employees));
+            res.write(JSON.stringify(full_names));
             res.end();
         }
 
@@ -45,11 +63,13 @@ const server = http.createServer((req, res) => {
         {
             //TODO - Display Sum of all employees salary in given JSON format 
             //e.g. { "total_salary" : 100 }
+
+            // Loop through employees and add their salary to total
             let total = 0;
-            Employee.employees.forEach(employee => {
+            emp.forEach(employee => {
                 total += employee.Salary;
             });
-
+            
             let total_salary = [{total_salary: "total_salary", amount: total}];
 
             res.writeHead(200, {'Content-Type': 'application/json'})
