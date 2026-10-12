@@ -1,0 +1,28 @@
+const express = require("express");
+
+const routes = express.Router();
+
+// Student or Route level middleware can be added here if needed
+routes.use((req, res, next) => {
+    console.log(`Student route middleware - ${req.method} ${req.url}`);
+    next();
+});
+
+// http://localhost:3000/students (get)
+routes.get('/', (req, res) => {
+    // res.send('<h1>List of students</h1>');
+    const students = [
+        { id: 1, name: 'John Doe' },
+        { id: 2, name: 'Jane Smith' },
+        { id: 3, name: 'Alice Johnson' }
+    ];
+    // res.status(200)
+    //     .json(students);
+     throw new Error("Error from Students");
+});
+
+routes.post("/", (req, res) => {
+    res.send("<h1>Student created successfully!</h1>");
+});
+
+module.exports = routes;
